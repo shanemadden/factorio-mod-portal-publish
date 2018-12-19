@@ -11,6 +11,4 @@ sh -c "zip -r $1_${TAG}.zip . $1 -x \*.git\*"
 
 sh -c "ls -la"
 
-sh -c "curl -X POST -F \"file=@$1_${TAG}.zip\" https://mods.factorio.com/mod/$1/downloads/edit?username=${FACTORIO_USER}&token=${FACTORIO_TOKEN}"
-
-sh -c "ls -la"
+sh -c "curl -v -X POST -F \"file=@$1_${TAG}.zip\" https://mods.factorio.com/mod/$1/downloads/edit?username=${FACTORIO_USER}&token=${FACTORIO_TOKEN}"
