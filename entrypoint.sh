@@ -59,10 +59,11 @@ if [ -z "${FILENAME}" ]; then
     echo "Upload failed"
     exit 1
 fi
-
+echo "${UPLOAD_RESULT}"
 echo "Uploaded $1_${TAG}.zip to ${FILENAME}, submitting"
+echo "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}"
 
 # Post the form, completing the release
-curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" https://mods.factorio.com/mod/$1/downloads/edit
+curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
 
 echo "Completed"
