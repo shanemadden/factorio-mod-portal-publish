@@ -13,7 +13,7 @@ if ! echo "${TAG}" | grep -P --quiet '^\d+\.\d+\.\d+$'; then
     exit 1
 fi
 
-INFO_VERSION=$(jq '.version' info.json)
+INFO_VERSION=$(jq -r '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
 if ! [[ "${INFO_VERSION}" == "${TAG}" ]]; then
     echo "Tag version doesn't ${TAG} match info.json version ${INFO_VERSION} (or info.json is invalid), failed"
