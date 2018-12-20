@@ -13,8 +13,9 @@ if ! echo "${TAG}" | grep -P --quiet '^\d+\.\d+\.\d+$'; then
     exit 1
 fi
 
+INFO_VERSION=$(jq '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
-if [ $(jq '.version' info.json) -ne "${TAG}" ]; then
+if [ "${INFO_VERSION}" -ne "${TAG}" ]; then
     echo "Tag version doesn't match info.json (or info.json is invalid), failed"
     exit 1
 fi
@@ -58,7 +59,10 @@ if [ -z "${FILENAME}" ]; then
     echo "Upload failed"
     exit 1
 fi
+
+echo "Uploaded $1_${TAG}.zip to ${FILENAME}, submitting"
+
 # Post the form, completing the release
-curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
+curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" https://mods.factorio.com/mod/$1/downloads/edit
 
 echo "Completed"
