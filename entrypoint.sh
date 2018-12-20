@@ -15,14 +15,16 @@ fi
 
 INFO_VERSION=$(jq '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
-if [[ "${INFO_VERSION}" -ne "${TAG}" ]]; then
+if [[ "${INFO_VERSION}" != "${TAG}" ]]; then
     echo "Tag version doesn't match info.json (or info.json is invalid), failed"
     exit 1
 fi
 # Create the zip
 mkdir /tmp/zip
 ln -s /github/workspace "/tmp/zip/$1_${TAG}"
+pushd /tmp/zip
 zip -q -r "$1_${TAG}.zip" "/tmp/zip/$1_${TAG}" -x \*.git\*
+popd
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
 unzip -l "$1_${TAG}.zip"
