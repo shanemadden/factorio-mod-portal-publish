@@ -15,7 +15,7 @@ fi
 
 INFO_VERSION=$(jq '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
-if [[ "${INFO_VERSION}" -ne "${TAG}" ]]; then
+if ! [[ "${INFO_VERSION}" == "${TAG}" ]]; then
     echo "Tag version doesn't match info.json (or info.json is invalid), failed"
     exit 1
 fi
@@ -62,12 +62,11 @@ CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr " " "+" | tr -d "\r\
 INFO=$(echo ${UPLOAD_RESULT} | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
 FILENAME=$(echo ${UPLOAD_RESULT} | jq -r '.filename')
 
-if [[ "${FILENAME}" -eq "null" ]] || [[ -z "${FILENAME}" ]]; then
+if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
     exit 1
 fi
 echo "Uploaded $1_${TAG}.zip to ${FILENAME}, submitting"
-echo "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}"
 
 # Post the form, completing the release
 curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
