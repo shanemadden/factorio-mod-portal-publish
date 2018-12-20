@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Parse the tag we're on, do nothing if there isn't one
 TAG=$(echo ${GITHUB_REF} | grep tags | grep -o "[^/]*$")
@@ -25,6 +25,7 @@ ln -s /github/workspace "/tmp/zip/$1_${TAG}"
 zip -q -r "$1_${TAG}.zip" "/tmp/zip/$1_${TAG}" -x \*.git\*
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
+unzip -l "$1_${TAG}.zip"
 
 # Get a CSRF token by loading the login form
 CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
