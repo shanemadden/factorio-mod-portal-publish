@@ -19,7 +19,9 @@ if [ $(jq '.version' info.json) -ne "${TAG}" ]; then
     exit 1
 fi
 # Create the zip
-zip -r "$1_${TAG}.zip" . $1 -x \*.git\*
+zip -q -r "$1_${TAG}.zip" . $1 -x \*.git\*
+FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
+echo "File zipped, ${FILESIZE} bytes"
 
 # Get a CSRF token by loading the login form
 CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
@@ -48,16 +50,15 @@ fi
 UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@$1_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
 
 # Parse 'em and stat the file for the form fields
-CHANGELOG=$(echo ${UPLOAD_RESULT} | jq '.changelog')
-INFO=$(echo ${UPLOAD_RESULT} | jq '.info')
-FILENAME=$(echo ${UPLOAD_RESULT} | jq '.filename')
-FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
+CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
+INFO=$(echo ${UPLOAD_RESULT} | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
+FILENAME=$(echo ${UPLOAD_RESULT} | jq -r '.filename')
 
 if [ -z "${FILENAME}" ]; then
     echo "Upload failed"
     exit 1
 fi
 # Post the form, completing the release
-curl -b cookiejar.txt -c cookiejar.txt -s -F "file=" -F "info_json=${INFO}" -F "changelog=${CHANGELOG}" -F "filename=${FILENAME}" -F "file_size=${FILESIZE}" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
+curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
 
 echo "Completed"
