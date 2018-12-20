@@ -15,7 +15,7 @@ fi
 
 INFO_VERSION=$(jq '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
-if [[ "${INFO_VERSION}" != "${TAG}" ]]; then
+if [[ "${INFO_VERSION}" -ne "${TAG}" ]]; then
     echo "Tag version doesn't match info.json (or info.json is invalid), failed"
     exit 1
 fi
