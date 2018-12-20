@@ -23,7 +23,7 @@ fi
 mkdir /tmp/zip
 ln -s /github/workspace "/tmp/zip/$1_${TAG}"
 pushd /tmp/zip
-zip -q -r "/github/workspace/$1_${TAG}.zip" "/tmp/zip/$1_${TAG}" -x \*.git\*
+zip -q -r "/github/workspace/$1_${TAG}.zip" "$1_${TAG}" -x \*.git\*
 popd
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
