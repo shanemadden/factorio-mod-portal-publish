@@ -2,7 +2,7 @@
 
 # Parse the tag we're on, do nothing if there isn't one
 TAG=$(echo ${GITHUB_REF} | grep tags | grep -o "[^/]*$")
-if [ -z "${TAG}" ]; then
+if [[ -z "${TAG}" ]]; then
     echo "Not a tag push, skipping"
     exit 78
 fi
@@ -15,14 +15,14 @@ fi
 
 INFO_VERSION=$(jq '.version' info.json)
 # Make sure the info.json is parseable and has the expected version number
-if [ "${INFO_VERSION}" -ne "${TAG}" ]; then
+if [[ "${INFO_VERSION}" -ne "${TAG}" ]]; then
     echo "Tag version doesn't match info.json (or info.json is invalid), failed"
     exit 1
 fi
 # Create the zip
 mkdir /tmp/zip
-ln -s /github/workspace /tmp/zip/$1_${TAG}
-zip -q -r "$1_${TAG}.zip" /tmp/zip -x \*.git\*
+ln -s /github/workspace "/tmp/zip/$1_${TAG}"
+zip -q -r "$1_${TAG}.zip" "/tmp/zip/$1_${TAG}" -x \*.git\*
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
 
@@ -37,7 +37,7 @@ curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/api/mods/$1/
 # store the return code before running anything else
 STATUS_CODE=$?
 
-if [ $STATUS_CODE -ne 4 ]; then
+if [[ $STATUS_CODE -ne 4 ]]; then
     echo "Release already exists, skipping"
     exit 78
 fi
@@ -45,7 +45,7 @@ echo "Release doesn't exist for ${TAG}, uploading"
 
 # Load the upload form, getting an upload token
 UPLOAD_TOKEN=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/mod/$1/downloads/edit | grep token | sed -r -e "s/.*token: '(.*)'.*/\1/")
-if [ -z "${UPLOAD_TOKEN}" ]; then
+if [[ -z "${UPLOAD_TOKEN}" ]]; then
     echo "Couldn't get an upload token, failed"
     exit 1
 fi
@@ -59,7 +59,7 @@ CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr " " "+" | tr -d "\r\
 INFO=$(echo ${UPLOAD_RESULT} | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
 FILENAME=$(echo ${UPLOAD_RESULT} | jq -r '.filename')
 
-if [ "${FILENAME}" -eq "null" ] || [ -z "${FILENAME}" ]; then
+if [[ "${FILENAME}" -eq "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
     exit 1
 fi
