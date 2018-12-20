@@ -20,7 +20,9 @@ if [ "${INFO_VERSION}" -ne "${TAG}" ]; then
     exit 1
 fi
 # Create the zip
-zip -q -r "$1_${TAG}.zip" . $1 -x \*.git\*
+mkdir /tmp/zip
+ln -s /github/workspace /tmp/zip/$1_${TAG}
+zip -q -r "$1_${TAG}.zip" /tmp/zip -x \*.git\*
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
 
@@ -57,7 +59,7 @@ CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr " " "+" | tr -d "\r\
 INFO=$(echo ${UPLOAD_RESULT} | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
 FILENAME=$(echo ${UPLOAD_RESULT} | jq -r '.filename')
 
-if [ -z "${FILENAME}" ]; then
+if [ "${FILENAME}" -eq "null" ] || [ -z "${FILENAME}" ]; then
     echo "Upload failed"
     exit 1
 fi
