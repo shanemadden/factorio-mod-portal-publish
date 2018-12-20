@@ -39,6 +39,7 @@ if [ $STATUS_CODE -ne 4 ]; then
     echo "Release already exists, skipping"
     exit 78
 fi
+echo "Release doesn't exist for ${TAG}, uploading"
 
 # Load the upload form, getting an upload token
 UPLOAD_TOKEN=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/mod/$1/downloads/edit | grep token | sed -r -e "s/.*token: '(.*)'.*/\1/")
@@ -49,6 +50,7 @@ fi
 
 # Upload the file, getting back a response with details to send in the final form submission to complete the upload
 UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@$1_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
+echo "result: ${UPLOAD_RESULT}"
 
 # Parse 'em and stat the file for the form fields
 CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
@@ -59,7 +61,6 @@ if [ -z "${FILENAME}" ]; then
     echo "Upload failed"
     exit 1
 fi
-echo "${UPLOAD_RESULT}"
 echo "Uploaded $1_${TAG}.zip to ${FILENAME}, submitting"
 echo "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}"
 
