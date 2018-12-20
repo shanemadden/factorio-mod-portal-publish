@@ -9,7 +9,7 @@ fi
 
 # Validate the version string we're building
 if ! echo "${TAG}" | grep -P --quiet '^\d+\.\d+\.\d+$'; then
-    echo "Bad version, needs to be %u.%u.%u."
+    echo "Bad version, needs to be %u.%u.%u"
     exit 1
 fi
 
@@ -23,7 +23,7 @@ fi
 mkdir /tmp/zip
 ln -s /github/workspace "/tmp/zip/$1_${TAG}"
 pushd /tmp/zip
-zip -q -r "/github/workspace/$1_${TAG}.zip" "$1_${TAG}" -x \*.git\*
+zip -9 -q -r "/github/workspace/$1_${TAG}.zip" "$1_${TAG}" -x \*.git\*
 popd
 FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
