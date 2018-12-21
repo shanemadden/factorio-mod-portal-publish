@@ -19,15 +19,18 @@ if ! [[ "${INFO_VERSION}" == "${TAG}" ]]; then
     echo "Tag version doesn't ${TAG} match info.json version ${INFO_VERSION} (or info.json is invalid), failed"
     exit 1
 fi
+# Pull the mod name from info.json
+NAME=$(jq -r '.name' info.json)
+
 # Create the zip
 mkdir /tmp/zip
-ln -s /github/workspace "/tmp/zip/$1_${TAG}"
+ln -s /github/workspace "/tmp/zip/${NAME}_${TAG}"
 pushd /tmp/zip
-zip -9 -q -r "/github/workspace/$1_${TAG}.zip" "$1_${TAG}" -x \*.git\*
+zip -9 -q -r "/github/workspace/${NAME}_${TAG}.zip" "${NAME}_${TAG}" -x \*.git\*
 popd
-FILESIZE=$(stat --printf="%s" "$1_${TAG}.zip")
+FILESIZE=$(stat --printf="%s" "${NAME}_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
-unzip -l "$1_${TAG}.zip"
+unzip -l "${NAME}_${TAG}.zip"
 
 # Get a CSRF token by loading the login form
 CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
@@ -36,7 +39,7 @@ CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login
 curl -b cookiejar.txt -c cookiejar.txt -s -F "csrf_token=${CSRF}" -F "username=${FACTORIO_USER}" -F "password=${FACTORIO_PASSWORD}" -o /dev/null https://mods.factorio.com/login
 
 # Query the mod info, verify the version number we're trying to push doesn't already exist
-curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/api/mods/$1/full | jq -e ".releases[] | select(.version == \"${TAG}\")"
+curl -b cookiejar.txt -c cookiejar.txt -s "https://mods.factorio.com/api/mods/${NAME}/full" | jq -e ".releases[] | select(.version == \"${TAG}\")"
 # store the return code before running anything else
 STATUS_CODE=$?
 
@@ -47,14 +50,14 @@ fi
 echo "Release doesn't exist for ${TAG}, uploading"
 
 # Load the upload form, getting an upload token
-UPLOAD_TOKEN=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/mod/$1/downloads/edit | grep token | sed -r -e "s/.*token: '(.*)'.*/\1/")
+UPLOAD_TOKEN=$(curl -b cookiejar.txt -c cookiejar.txt -s "https://mods.factorio.com/mod/${NAME}/downloads/edit" | grep token | sed -r -e "s/.*token: '(.*)'.*/\1/")
 if [[ -z "${UPLOAD_TOKEN}" ]]; then
     echo "Couldn't get an upload token, failed"
     exit 1
 fi
 
 # Upload the file, getting back a response with details to send in the final form submission to complete the upload
-UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@$1_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
+UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
 echo "result: ${UPLOAD_RESULT}"
 
 # Parse 'em and stat the file for the form fields
@@ -66,9 +69,9 @@ if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
     exit 1
 fi
-echo "Uploaded $1_${TAG}.zip to ${FILENAME}, submitting"
+echo "Uploaded ${NAME}_${TAG}.zip to ${FILENAME}, submitting"
 
 # Post the form, completing the release
-curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null https://mods.factorio.com/mod/$1/downloads/edit
+curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null "https://mods.factorio.com/mod/${NAME}/downloads/edit"
 
 echo "Completed"
