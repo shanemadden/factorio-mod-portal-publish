@@ -61,9 +61,9 @@ UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TA
 echo "result: ${UPLOAD_RESULT}"
 
 # Parse 'em and stat the file for the form fields
-CHANGELOG=$(echo ${UPLOAD_RESULT} | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
-INFO=$(echo ${UPLOAD_RESULT} | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
-FILENAME=$(echo ${UPLOAD_RESULT} | jq -r '.filename')
+CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
+INFO=$(echo "${UPLOAD_RESULT}" | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
+FILENAME=$(echo "${UPLOAD_RESULT}" | jq -r '.filename')
 
 if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
