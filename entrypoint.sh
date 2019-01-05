@@ -30,7 +30,7 @@ zip -9 -q -r "/github/workspace/${NAME}_${TAG}.zip" "${NAME}_${TAG}" -x \*.git\*
 popd
 FILESIZE=$(stat --printf="%s" "${NAME}_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
-unzip -l "${NAME}_${TAG}.zip"
+unzip -v "${NAME}_${TAG}.zip"
 
 # Get a CSRF token by loading the login form
 CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
@@ -58,7 +58,6 @@ fi
 
 # Upload the file, getting back a response with details to send in the final form submission to complete the upload
 UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
-echo "result: ${UPLOAD_RESULT}"
 
 # Parse 'em and stat the file for the form fields
 CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
@@ -69,7 +68,7 @@ if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
     exit 1
 fi
-echo "Uploaded ${NAME}_${TAG}.zip to ${FILENAME}, submitting"
+echo "Uploaded ${NAME}_${TAG}.zip to ${FILENAME}, submitting as new version"
 
 # Post the form, completing the release
 curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null "https://mods.factorio.com/mod/${NAME}/downloads/edit"
