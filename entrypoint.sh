@@ -63,6 +63,7 @@ UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TA
 CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
 INFO=$(echo "${UPLOAD_RESULT}" | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
 FILENAME=$(echo "${UPLOAD_RESULT}" | jq -r '.filename')
+THUMBNAIL=$(echo "${UPLOAD_RESULT}" | jq -r '.thumbnail')
 
 if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
@@ -71,6 +72,6 @@ fi
 echo "Uploaded ${NAME}_${TAG}.zip to ${FILENAME}, submitting as new version"
 
 # Post the form, completing the release
-curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null "https://mods.factorio.com/mod/${NAME}/downloads/edit"
+curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}&thumbnail=${THUMBNAIL}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null "https://mods.factorio.com/mod/${NAME}/downloads/edit"
 
 echo "Completed"
