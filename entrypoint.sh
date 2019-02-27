@@ -63,7 +63,7 @@ UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TA
 CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
 INFO=$(echo "${UPLOAD_RESULT}" | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
 FILENAME=$(echo "${UPLOAD_RESULT}" | jq -r '.filename')
-THUMBNAIL=$(echo "${UPLOAD_RESULT}" | jq -r '.thumbnail')
+THUMBNAIL=$(echo "${UPLOAD_RESULT}" | jq -r '.thumbnail // empty')
 
 if [[ "${FILENAME}" == "null" ]] || [[ -z "${FILENAME}" ]]; then
     echo "Upload failed"
