@@ -60,8 +60,8 @@ fi
 UPLOAD_RESULT=$(curl -b cookiejar.txt -c cookiejar.txt -s -F "file=@${NAME}_${TAG}.zip;type=application/x-zip-compressed" "https://direct.mods-data.factorio.com/upload/mod/${UPLOAD_TOKEN}")
 
 # Parse 'em and stat the file for the form fields
-CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '.changelog' | tr "\t" "    " | tr " " "+" )
-INFO=$(echo "${UPLOAD_RESULT}" | jq -r '.info' | tr " " "+" | tr -d "\r\n" | tr -d "\t")
+CHANGELOG=$(echo "${UPLOAD_RESULT}" | jq -r '@uri "\(.changelog)"')
+INFO=$(echo "${UPLOAD_RESULT}" | jq -r '@uri "\(.info)"')
 FILENAME=$(echo "${UPLOAD_RESULT}" | jq -r '.filename')
 THUMBNAIL=$(echo "${UPLOAD_RESULT}" | jq -r '.thumbnail // empty')
 
