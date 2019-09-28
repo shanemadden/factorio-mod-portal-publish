@@ -11,15 +11,19 @@ Non-tag pushes will be ignored, but when a tag is pushed that is valid and match
 
 An example workflow to publish tagged releases:
 
-    workflow "Publish mod to portal" {
-      on = "push"
-      resolves = ["shanemadden/factorio-mod-portal-publish@stable"]
-    }
+    on: push
+    name: Publish
+    jobs:
+      publish:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@master
+        - name: Publish Mod
+          uses: shanemadden/factorio-mod-portal-publish@stable
+          env:
+            FACTORIO_PASSWORD: ${{ secrets.FACTORIO_PASSWORD }}
+            FACTORIO_USER: ${{ secrets.FACTORIO_USER }}
 
-    action "shanemadden/factorio-mod-portal-publish@stable" {
-      uses = "shanemadden/factorio-mod-portal-publish@stable"
-      secrets = ["FACTORIO_USER", "FACTORIO_PASSWORD"]
-    }
 
 `FACTORIO_USER` and `FACTORIO_PASSWORD` secrets should be valid credentials to the Factorio mod portal with permissions to edit the mod defined in info.json.
 
