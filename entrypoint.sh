@@ -4,7 +4,7 @@
 TAG=$(echo ${GITHUB_REF} | grep tags | grep -o "[^/]*$")
 if [[ -z "${TAG}" ]]; then
     echo "Not a tag push, skipping"
-    exit 78
+    exit 0
 fi
 
 # Validate the version string we're building
