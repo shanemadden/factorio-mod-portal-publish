@@ -45,7 +45,7 @@ STATUS_CODE=$?
 
 if [[ $STATUS_CODE -ne 4 ]]; then
     echo "Release already exists, skipping"
-    exit 78
+    exit 0
 fi
 echo "Release doesn't exist for ${TAG}, uploading"
 
@@ -73,5 +73,6 @@ echo "Uploaded ${NAME}_${TAG}.zip to ${FILENAME}, submitting as new version"
 
 # Post the form, completing the release
 curl -b cookiejar.txt -c cookiejar.txt -s -X POST -d "file=&info_json=${INFO}&changelog=${CHANGELOG}&filename=${FILENAME}&file_size=${FILESIZE}&thumbnail=${THUMBNAIL}" -H "Content-Type: application/x-www-form-urlencoded" -o /dev/null "https://mods.factorio.com/mod/${NAME}/downloads/edit"
+# TODO if that had a failure exit code then report failure, exit 1
 
 echo "Completed"
