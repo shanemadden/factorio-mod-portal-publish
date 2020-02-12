@@ -1,0 +1,9 @@
+name: 'Factorio Mod Portal Publish'
+author: 'Shane Madden'
+description: 'Publishes repos with Factorio mods to the Factorio mod portal'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'settings'  
+  color: 'orange'
