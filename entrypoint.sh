@@ -26,6 +26,9 @@ NAME=$(jq -r '.name' info.json)
 mkdir /tmp/zip
 ln -s /github/workspace "/tmp/zip/${NAME}_${TAG}"
 pushd /tmp/zip
+# TODO use git archive instead
+# example https://github.com/justarandomgeek/factorio-pushbutton/blob/master/makerelease.sh
+
 zip -9 -q -r "/github/workspace/${NAME}_${TAG}.zip" "${NAME}_${TAG}" -x \*.git\*
 popd
 FILESIZE=$(stat --printf="%s" "${NAME}_${TAG}.zip")
@@ -33,7 +36,7 @@ echo "File zipped, ${FILESIZE} bytes"
 unzip -v "${NAME}_${TAG}.zip"
 
 # Get a CSRF token by loading the login form
-CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://mods.factorio.com/login | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
+CSRF=$(curl -b cookiejar.txt -c cookiejar.txt -s https://factorio.com/login?mods=1 | grep csrf_token | sed -r -e 's/.*value="(.*)".*/\1/')
 
 # Authenticate with the credential secrets and the CSRF token, getting a session cookie for the authorized user
 curl -b cookiejar.txt -c cookiejar.txt -s -F "csrf_token=${CSRF}" -F "username=${FACTORIO_USER}" -F "password=${FACTORIO_PASSWORD}" -o /dev/null https://mods.factorio.com/login
