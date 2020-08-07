@@ -27,4 +27,11 @@ An example workflow to publish tagged releases:
 
 `FACTORIO_USER` and `FACTORIO_PASSWORD` secrets should be valid credentials to the Factorio mod portal with permissions to edit the mod defined in info.json.
 
+A valid .gitattributes file is required to filter .git*/* directories. This file must be checked in and tagged to filter during a git-archive operation.
+
+    .gitattributes export-ignore
+    .gitignore export-ignore
+    .github export-ignore
+
+
 Be aware that the zip will be published and immediately available for download for users - make sure you're ready to publish the changes and have tested the commit before pushing the tag!
