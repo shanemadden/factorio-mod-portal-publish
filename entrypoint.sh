@@ -23,10 +23,7 @@ fi
 NAME=$(jq -r '.name' info.json)
 
 # Create the zip
-mkdir /tmp/zip
-pushd /tmp/zip
-git archive --prefix "${NAME}_$INFO_VERSION/" -o "${NAME}_$INFO_VERSION.zip" "${TAG}"
-popd
+git archive --prefix "${NAME}_$INFO_VERSION/" -o "/github/workspace/${NAME}_$INFO_VERSION.zip" "${TAG}"
 FILESIZE=$(stat --printf="%s" "${NAME}_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
 unzip -v "${NAME}_${TAG}.zip"
