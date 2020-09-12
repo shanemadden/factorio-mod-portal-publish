@@ -8,7 +8,7 @@ LABEL "com.github.actions.color"="orange"
 LABEL "repository"="https://github.com/shanemadden/factorio-mod-portal-publish"
 LABEL "maintainer"="Shane Madden"
 
-RUN apt-get update && apt-get -y install curl zip jq
+RUN apt-get update && apt-get -y install curl zip jq git
 
 ADD entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

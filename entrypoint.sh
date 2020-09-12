@@ -23,14 +23,7 @@ fi
 NAME=$(jq -r '.name' info.json)
 
 # Create the zip
-mkdir /tmp/zip
-ln -s /github/workspace "/tmp/zip/${NAME}_${TAG}"
-pushd /tmp/zip
-# TODO use git archive instead
-# example https://github.com/justarandomgeek/factorio-pushbutton/blob/master/makerelease.sh
-
-zip -9 -q -r "/github/workspace/${NAME}_${TAG}.zip" "${NAME}_${TAG}" -x \*.git\*
-popd
+git archive --prefix "${NAME}_$INFO_VERSION/" -o "/github/workspace/${NAME}_$INFO_VERSION.zip" "${TAG}"
 FILESIZE=$(stat --printf="%s" "${NAME}_${TAG}.zip")
 echo "File zipped, ${FILESIZE} bytes"
 unzip -v "${NAME}_${TAG}.zip"
