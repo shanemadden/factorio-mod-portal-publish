@@ -8,9 +8,14 @@ if [[ -z "${TAG}" ]]; then
 fi
 
 # Validate the version string we're building
-if ! echo "${TAG}" | grep -P --quiet '^\d+\.\d+\.\d+$'; then
-    echo "Bad version, needs to be %u.%u.%u"
+if ! echo "${TAG}" | grep -P --quiet '^(v)?\d+\.\d+\.\d+$'; then
+    echo "Bad version, needs to be (v)%u.%u.%u"
     exit 1
+fi
+
+# Strip "v" if it is prepended to the semver
+if [[ "${TAG:0:1}" == "v" ]]; then
+  TAG="${TAG:1}"
 fi
 
 INFO_VERSION=$(jq -r '.version' info.json)
