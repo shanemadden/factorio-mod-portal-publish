@@ -11,8 +11,10 @@ Non-tag pushes will be ignored, but when a tag is pushed that is valid and match
 
 An example workflow to publish tagged releases:
 
-    on: push
-    name: Publish
+    on:
+      push:
+        tags:
+          - v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)
     jobs:
       publish:
         runs-on: ubuntu-latest
