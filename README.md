@@ -19,7 +19,7 @@ An example workflow to publish tagged releases:
         steps:
         - uses: actions/checkout@master
         - name: Publish Mod
-          uses: shanemadden/factorio-mod-portal-publish@stable
+          uses: shanemadden/factorio-mod-portal-publish@master
           env:
             FACTORIO_PASSWORD: ${{ secrets.FACTORIO_PASSWORD }}
             FACTORIO_USER: ${{ secrets.FACTORIO_USER }}
